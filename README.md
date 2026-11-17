@@ -2,14 +2,16 @@
 
 Finds people on video who are not wearing their safety gear (helmet, vest), double-checks every finding with a vision-language model, and shows the results on a live web dashboard.
 
-<!-- Screenshots: save them to docs/ and uncomment
+
 **Before verifying:** what the PPE model flagged
 
 ![Dashboard before VLM verification](docs/before-verify.png)
+<img width="2201" height="1405" alt="before" src="https://github.com/user-attachments/assets/478d77ac-edb9-492e-82d0-8687cad6a334" />
 
 **After verifying:** the VLM's verdicts, with the cases it disagreed with marked for review
+<img width="2201" height="1405" alt="during" src="https://github.com/user-attachments/assets/ce71d38a-d84f-44bf-8d9a-1b1a10d4b28b" />
+<img width="2201" height="1405" alt="after" src="https://github.com/user-attachments/assets/02ddf63c-bb4f-49c4-a108-8dac8290a8a0" />
 
-![Dashboard after VLM verification](docs/after-verify.png)
 -->
 
 It works in two stages:
