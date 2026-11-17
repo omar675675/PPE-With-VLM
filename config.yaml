@@ -1,0 +1,64 @@
+# Settings for process.py and dashboard.py.
+# Relative paths are relative to this file's folder.
+
+models:
+  person: models/yolov8n-person.pt
+  ppe: models/ppe-m.pt
+
+# Video files or anything OpenCV can open (e.g. rtsp://...).
+# `name` is used in the dashboard and as the output folder name.
+streams:
+  # - name: ppe1
+  #   source: videos/ppe1.mp4
+  # - name: ppe2
+  #   source: videos/ppe2.mp4
+  - name: ppe3
+    source: videos/ppe3.mp4
+
+output_dir: output
+device: 0          # GPU index, or "cpu"
+half: true         # FP16 inference (GPU only)
+
+person:
+  imgsz: 1280        # person model was trained at 1280
+  det_conf: 0.1      # keep low: ByteTrack uses weak detections to hold on to people
+  check_conf: 0.4    # only run the PPE check when the person box is at least this confident
+  min_height: 80     # skip people smaller than this (px) - too small to judge PPE
+  crop_pad: 0.05     # grow the person box by 5% on each side before cropping
+
+ppe:
+  imgsz: 640
+  conf: 0.25            # min confidence for any PPE box to be considered
+  violation_conf: 0.5   # a "no_..." box must be at least this confident
+  # Each check: the good class, the bad class, and where in the person crop
+  # (fractions of width/height) that item is expected. Boxes outside the
+  # region are ignored - stops a neighbour's helmet/vest from counting.
+  checks:
+    no_helmet:
+      good: helmet
+      bad: no_helmet
+      region: { x: [0.15, 0.85], y: [0.0, 0.40] }
+    no_vest:
+      good: vest
+      bad: no_vest
+      region: { x: [0.15, 0.85], y: [0.15, 0.75] }
+
+# A person is only flagged for a violation if it shows up in at least
+# `min_hits` frames AND in at least `min_ratio` of the frames they were checked in.
+violation:
+  min_hits: 5
+  min_ratio: 0.3
+
+# ByteTrack settings (passed straight to ultralytics)
+tracker:
+  tracker_type: bytetrack
+  track_high_thresh: 0.4   # detections above this are matched first
+  track_low_thresh: 0.1    # weaker detections are used in a second pass to keep existing tracks alive
+  new_track_thresh: 0.5    # a new ID is only started from a detection at least this confident
+  track_buffer: 150        # frames a lost person is remembered (~5 s at 30 fps)
+  match_thresh: 0.8
+  fuse_score: true
+
+dashboard:
+  host: 0.0.0.0
+  port: 9000
