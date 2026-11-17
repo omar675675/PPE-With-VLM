@@ -14,6 +14,7 @@ Run:
     .venv/bin/python process.py [config.yaml]
 """
 
+import gc
 import json
 import os
 import shutil
@@ -23,6 +24,7 @@ import time
 from pathlib import Path
 
 import cv2
+import torch
 import yaml
 from ultralytics import YOLO
 
@@ -82,6 +84,11 @@ def judge(ppe_result, names, crop_w, crop_h, cfg):
     found, checked = {}, set()
     for vio, c in checks.items():
         g, b = best.get((vio, c["good"]), 0.0), best.get((vio, c["bad"]), 0.0)
+        if cfg["ppe"].get("flag_everyone"):
+            # test mode: flag every check, whatever the model saw (to test the VLM step)
+            checked.add(vio)
+            found[vio] = max(b, 0.001)  # keep a small conf so the best-frame logic still works
+            continue
         if g or b:
             checked.add(vio)
         if b >= cfg["ppe"]["violation_conf"] and b > g:
@@ -243,6 +250,12 @@ def main(config_path=None):
             process_stream(stream, cfg, ppe_model, tracker_file, writer)
     finally:
         os.unlink(tracker_file)
+
+    # give the GPU memory back, so the VLM fits fully on the GPU when verifying
+    del ppe_model
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     writer.status = {"state": "done"}
     writer.save()

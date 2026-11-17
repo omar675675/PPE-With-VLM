@@ -8,12 +8,12 @@ models:
 # Video files or anything OpenCV can open (e.g. rtsp://...).
 # `name` is used in the dashboard and as the output folder name.
 streams:
-  # - name: ppe1
-  #   source: videos/ppe1.mp4
-  # - name: ppe2
-  #   source: videos/ppe2.mp4
-  - name: ppe3
-    source: videos/ppe3.mp4
+  - name: ppe1
+    source: videos/ppe4.mp4
+  - name: ppe2
+    source: videos/ppe5.mp4
+  # - name: ppe3
+  #   source: videos/ppe3.mp4
 
 output_dir: output
 device: 0          # GPU index, or "cpu"
@@ -28,8 +28,11 @@ person:
 
 ppe:
   imgsz: 640
-  conf: 0.25            # min confidence for any PPE box to be considered
-  violation_conf: 0.5   # a "no_..." box must be at least this confident
+  conf: 0.01         # min confidence for any PPE box to be considered
+  violation_conf: 0.01 # a "no_..." box must be at least this confident
+  # TEST ONLY: flag every checked person for every check below, whatever the
+  # PPE model says. Use it to test the VLM step and the Keep/Delete review.
+  flag_everyone: true
   # Each check: the good class, the bad class, and where in the person crop
   # (fractions of width/height) that item is expected. Boxes outside the
   # region are ignored - stops a neighbour's helmet/vest from counting.
@@ -46,8 +49,8 @@ ppe:
 # A person is only flagged for a violation if it shows up in at least
 # `min_hits` frames AND in at least `min_ratio` of the frames they were checked in.
 violation:
-  min_hits: 5
-  min_ratio: 0.3
+  min_hits: 1
+  min_ratio: 0.0
 
 # ByteTrack settings (passed straight to ultralytics)
 tracker:
@@ -62,3 +65,14 @@ tracker:
 dashboard:
   host: 0.0.0.0
   port: 9000
+
+# Second check of flagged people by a vision-language model (Ollama).
+# Started from the "Verify" button in the dashboard once processing is done.
+vlm:
+  url: http://localhost:11434
+  model: qwen3-vl:8b
+  timeout_s: 120
+  # How each item is described to the VLM. Keys are the `good` classes in ppe.checks.
+  items:
+    helmet: a safety helmet (hard hat) on their head
+    vest: a high-visibility safety vest
