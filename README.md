@@ -12,8 +12,6 @@ Finds people on video who are not wearing their safety gear (helmet, vest), doub
 <img width="2201" height="1405" alt="during" src="https://github.com/user-attachments/assets/ce71d38a-d84f-44bf-8d9a-1b1a10d4b28b" />
 <img width="2201" height="1405" alt="after" src="https://github.com/user-attachments/assets/02ddf63c-bb4f-49c4-a108-8dac8290a8a0" />
 
--->
-
 It works in two stages:
 
 1. **Detection (CNN).** YOLO models find and track every person, then check each person's crop for missing PPE.
