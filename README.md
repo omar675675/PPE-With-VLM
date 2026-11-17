@@ -4,8 +4,6 @@ Finds people on video who are not wearing their safety gear (helmet, vest), doub
 
 
 **Before verifying:** what the PPE model flagged
-
-![Dashboard before VLM verification](docs/before-verify.png)
 <img width="2201" height="1405" alt="before" src="https://github.com/user-attachments/assets/478d77ac-edb9-492e-82d0-8687cad6a334" />
 
 **After verifying:** the VLM's verdicts, with the cases it disagreed with marked for review
